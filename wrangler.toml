@@ -1,0 +1,14 @@
+# Configuration du serveur L'Antre, à la racine du dépôt pour que le bouton
+# « Deploy to Cloudflare » fonctionne sans aucune manipulation de fichiers.
+#
+# Déploiement en deux clics :
+#   https://deploy.workers.cloudflare.com/?url=https://github.com/chachou8106-blip/L-antre
+#
+# Ou en ligne de commande, depuis la racine :
+#   npx wrangler deploy
+
+name = "antre"
+main = "worker/worker.js"
+compatibility_date = "2026-01-01"
+
+# Le plan gratuit suffit : 100 000 requêtes par jour.

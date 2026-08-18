@@ -1,0 +1,6 @@
+name = "l-antre"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Déploiement : wrangler deploy
+# Le plan gratuit suffit : 100 000 requêtes par jour.

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff2d75">
+    <meta name="description" content="Agrégateur de recherches de rencontres, discret et sans compte.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>L'Antre — Agrégateur de recherches</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-door-open"></i> L'Antre</h1>
+        <p>Toutes tes recherches de rencontres, au même endroit</p>
+    </header>
+
+    <div class="container">
+        <p class="banner">
+            <i class="fas fa-circle-info"></i>
+            L'Antre interroge en direct les sources qui l'autorisent — les lieux réels
+            autour de toi (adresse, horaires, téléphone) et les annonces Reddit — puis
+            construit une requête prête à ouvrir pour celles qui exigent un compte.
+            Tes critères ne suppriment rien par défaut : ils classent.
+        </p>
+
+        <!-- Section Localisation -->
+        <section class="section">
+            <h2><i class="fas fa-map-marker-alt"></i> Localisation</h2>
+            <div class="location-options">
+                <button type="button" id="use-gps" class="btn btn-primary">
+                    <i class="fas fa-location-arrow"></i> Utiliser ma position GPS
+                </button>
+                <div class="or-separator">OU</div>
+                <div class="manual-location">
+                    <label class="sr-only" for="city-input">Ville</label>
+                    <input type="text" id="city-input" placeholder="Entrez une ville (ex : Paris)"
+                           autocomplete="off">
+                    <label class="sr-only" for="country-select">Pays</label>
+                    <select id="country-select">
+                        <option value="fr" selected>France</option>
+                        <option value="be">Belgique</option>
+                        <option value="ch">Suisse</option>
+                        <option value="ca">Canada</option>
+                    </select>
+                </div>
+                <p id="zone-label" class="zone-label"></p>
+                <div class="radius-selector">
+                    <label for="radius-select">Rayon :</label>
+                    <select id="radius-select">
+                        <option value="5">5 km</option>
+                        <option value="10">10 km</option>
+                        <option value="25">25 km</option>
+                        <option value="50" selected>50 km</option>
+                        <option value="100">100 km</option>
+                        <option value="200">200 km</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Sources -->
+        <section class="section">
+            <h2><i class="fas fa-layer-group"></i> Sources</h2>
+            <div class="checkbox-grid">
+                <label><input type="checkbox" name="source" value="serveur" checked> Serveur L'Antre <em>(direct)</em></label>
+                <label><input type="checkbox" name="source" value="reddit" checked> Reddit <em>(direct)</em></label>
+                <label><input type="checkbox" name="source" value="fetlife" checked> FetLife — profils <em>(lien)</em></label>
+                <label><input type="checkbox" name="source" value="fetlife-groups" checked> FetLife — groupes <em>(lien)</em></label>
+                <label><input type="checkbox" name="source" value="fetlife-events" checked> FetLife — événements <em>(lien)</em></label>
+                <label><input type="checkbox" name="source" value="maps" checked> Lieux &amp; clubs <em>(direct)</em></label>
+                <label><input type="checkbox" name="source" value="forums" checked> Forums <em>(lien)</em></label>
+                <label><input type="checkbox" name="source" value="craigslist"> Craigslist <em>(quasi inactif en France)</em></label>
+                <label><input type="checkbox" name="source" value="web" checked> Recherche web <em>(lien)</em></label>
+            </div>
+            <p class="field-hint">
+                FetLife demande un compte — gratuit, messagerie comprise. Une fois connecté,
+                ces trois liens ouvrent directement les résultats. Les groupes régionaux sont
+                le meilleur point d'entrée : on y annonce les rencontres et on y écrit sans
+                être un inconnu.
+            </p>
+
+            <h3 class="sources-subtitle"><i class="fas fa-comments"></i> Prendre contact</h3>
+            <div class="checkbox-grid">
+                <label><input type="checkbox" name="source" value="facebook" checked> Groupes Facebook</label>
+                <label><input type="checkbox" name="source" value="instagram" checked> Instagram</label>
+                <label><input type="checkbox" name="source" value="x" checked> X (Twitter)</label>
+                <label><input type="checkbox" name="source" value="happn"> Happn</label>
+            </div>
+            <p class="field-hint">
+                Ces liens s'ouvrent dans les apps où tu as déjà un compte, avec la recherche
+                pré-remplie : tu écris depuis ton profil, gratuitement. Happn fait exception —
+                il fonctionne par croisement de trajets et n'accepte aucune recherche.
+            </p>
+            <button type="button" id="select-all-sources" class="btn btn-secondary btn-small">
+                <i class="fas fa-check-double"></i> Tout cocher / décocher
+            </button>
+        </section>
+
+        <!-- Section Filtres -->
+        <section class="section">
+            <h2><i class="fas fa-filter"></i> Filtres de recherche</h2>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-venus-mars"></i> Genre</h3>
+                <label class="sr-only" for="gender-select">Genre</label>
+                <select id="gender-select" multiple size="5">
+                    <option value="Femme" selected>Femme</option>
+                    <option value="Homme">Homme</option>
+                    <option value="Trans (F→H)">Trans (Femme → Homme)</option>
+                    <option value="Trans (H→F)">Trans (Homme → Femme)</option>
+                    <option value="Non-binaire">Non-binaire</option>
+                    <option value="Couple">Couple</option>
+                    <option value="Groupe">Groupe</option>
+                </select>
+                <p class="field-hint">Maintiens Ctrl (ou ⌘) pour sélectionner plusieurs entrées.</p>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-theater-masks"></i> Rôle BDSM</h3>
+                <label class="sr-only" for="role-select">Rôle</label>
+                <select id="role-select" multiple size="5">
+                    <option value="Dominatrice" selected>Dominatrice</option>
+                    <option value="Dominant">Dominant</option>
+                    <option value="Soumise">Soumise</option>
+                    <option value="Soumis" selected>Soumis</option>
+                    <option value="Switch">Switch</option>
+                    <option value="Amatrice" selected>Amatrice</option>
+                    <option value="Amateur">Amateur</option>
+                    <option value="Maîtresse">Maîtresse</option>
+                    <option value="Esclave">Esclave</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-fire"></i> Pratiques</h3>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" name="practice" value="Sodomie" checked> Sodomie</label>
+                    <label><input type="checkbox" name="practice" value="Anal" checked> Anal</label>
+                    <label><input type="checkbox" name="practice" value="Bondage"> Bondage</label>
+                    <label><input type="checkbox" name="practice" value="Fellation"> Fellation</label>
+                    <label><input type="checkbox" name="practice" value="Femdom" checked> Femdom</label>
+                    <label><input type="checkbox" name="practice" value="Humiliation"> Humiliation</label>
+                    <label><input type="checkbox" name="practice" value="Exhibitionnisme"> Exhibitionnisme</label>
+                    <label><input type="checkbox" name="practice" value="Pénétration" checked> Pénétration</label>
+                    <label><input type="checkbox" name="practice" value="Jeux de rôle"> Jeux de rôle</label>
+                    <label><input type="checkbox" name="practice" value="Fessée"> Fessée</label>
+                    <label><input type="checkbox" name="practice" value="Menottes"> Menottes</label>
+                    <label><input type="checkbox" name="practice" value="Collier"> Collier</label>
+                    <label><input type="checkbox" name="practice" value="Gangbang"> Gangbang</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-user"></i> Attributs recherchés</h3>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" name="attribute" value="Gros seins" checked> Gros seins</label>
+                    <label><input type="checkbox" name="attribute" value="Petits seins"> Petits seins</label>
+                    <label><input type="checkbox" name="attribute" value="Naturels"> Naturels</label>
+                    <label><input type="checkbox" name="attribute" value="Siliconés"> Siliconés</label>
+                    <label><input type="checkbox" name="attribute" value="Minces"> Minces</label>
+                    <label><input type="checkbox" name="attribute" value="Athlétiques"> Athlétiques</label>
+                    <label><input type="checkbox" name="attribute" value="BBW"> BBW</label>
+                    <label><input type="checkbox" name="attribute" value="Grandes fesses"> Grandes fesses</label>
+                    <label><input type="checkbox" name="attribute" value="Blonde"> Blonde</label>
+                    <label><input type="checkbox" name="attribute" value="Brune"> Brune</label>
+                    <label><input type="checkbox" name="attribute" value="Rousse"> Rousse</label>
+                    <label><input type="checkbox" name="attribute" value="Tatouages"> Tatouages</label>
+                    <label><input type="checkbox" name="attribute" value="Piercings"> Piercings</label>
+                </div>
+                <p class="field-hint">
+                    Ces termes pèsent dans le score de correspondance. Ils n'écartent rien
+                    par eux-mêmes : c'est le mode de recherche, plus bas, qui décide du
+                    minimum exigé.
+                </p>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-birthday-cake"></i> Âge annoncé</h3>
+                <div class="range-slider">
+                    <div class="range-values">
+                        <span id="age-min-value">18</span>
+                        <span>à</span>
+                        <span id="age-max-value">99</span>
+                        <span>ans</span>
+                    </div>
+                    <label class="sr-only" for="age-min">Âge minimum</label>
+                    <input type="range" id="age-min" min="18" max="99" value="18">
+                    <label class="sr-only" for="age-max">Âge maximum</label>
+                    <input type="range" id="age-max" min="18" max="99" value="99">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-magnifying-glass"></i> Termes envoyés aux sites</h3>
+                <label class="sr-only" for="query-input">Requête</label>
+                <input type="text" id="query-input" class="query-input"
+                       placeholder="(calculé depuis tes filtres)" autocomplete="off">
+                <p class="field-hint">
+                    Les moteurs de recherche exigent <strong>tous</strong> les mots à la fois :
+                    plus tu en mets, moins tu obtiens de résultats. L'app envoie donc la ville
+                    et un mot de thème. Écris ici pour imposer tes propres termes — reste sur
+                    deux ou trois mots.
+                </p>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-sliders"></i> Mode de recherche</h3>
+                <label class="sr-only" for="search-mode">Mode de recherche</label>
+                <select id="search-mode">
+                    <option value="large" selected>Large — tout remonter, classé par correspondance</option>
+                    <option value="cible">Ciblé — au moins un critère doit correspondre</option>
+                    <option value="strict">Strict — un critère de chaque famille cochée</option>
+                </select>
+                <p class="field-hint">
+                    Commence en « large » : tu vois tout ce qui existe autour de toi, les
+                    meilleures correspondances en haut. Resserre ensuite si le volume gêne.
+                </p>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-sort"></i> Tri des résultats</h3>
+                <label class="sr-only" for="sort-select">Tri</label>
+                <select id="sort-select">
+                    <option value="pertinence" selected>Correspondance (score)</option>
+                    <option value="distance">Plus proches</option>
+                    <option value="recent">Plus récents</option>
+                    <option value="source">Par source</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-eye"></i> Analyse d'image (TensorFlow.js)</h3>
+                <div class="checkbox-list">
+                    <label>
+                        <input type="checkbox" id="vision-enabled">
+                        Analyser les vignettes avec MobileNet (~1 Mo téléchargés)
+                    </label>
+                </div>
+                <div id="vision-options" class="checkbox-list" hidden>
+                    <label>
+                        <input type="checkbox" id="vision-hide-nonphoto">
+                        Masquer les vignettes qui ne sont pas des photos (logos, captures)
+                    </label>
+                </div>
+                <p class="field-hint">
+                    MobileNet reconnaît des objets courants et étiquette les vignettes. Il ne
+                    reconnaît pas d'attributs corporels : ce tri-là reste basé sur le texte des annonces.
+                </p>
+            </div>
+
+            <div class="filter-group">
+                <h3><i class="fas fa-ban"></i> Exclusions</h3>
+                <div class="checkbox-list">
+                    <label><input type="checkbox" id="exclude-pros" checked> Exclure les annonces professionnelles / payantes</label>
+                    <label><input type="checkbox" id="exclude-verified"> Exclure les comptes vérifiés</label>
+                    <label><input type="checkbox" id="exclude-no-pic"> Exclure les annonces sans photo</label>
+                    <label><input type="checkbox" id="exclude-old" checked> Exclure les annonces de plus d'un mois</label>
+                    <label><input type="checkbox" id="exclude-paid" checked> Gratuit uniquement : écarter les sites payants</label>
+                </div>
+
+                <details class="blocklist">
+                    <summary>Serveur L'Antre <span id="relay-state"></span></summary>
+                    <p class="field-hint">
+                        Sans serveur, l'app se limite à ce qu'un navigateur peut atteindre, et
+                        subit les blocages de ton réseau. Avec serveur, elle récupère en plus
+                        le fédivers et les flux de forums, et Reddit cesse de dépendre de ton
+                        opérateur. Le code et la marche à suivre sont dans
+                        <code>worker/</code> du dépôt (Cloudflare Workers, gratuit,
+                        environ 5 minutes).
+                    </p>
+                    <label class="sr-only" for="relay-field">Adresse de ton relais</label>
+                    <input type="url" id="relay-field" placeholder="https://mon-relais.workers.dev"
+                           autocomplete="off" spellcheck="false">
+                    <div class="blocklist-actions">
+                        <button type="button" id="relay-save" class="btn btn-primary btn-small">
+                            <i class="fas fa-floppy-disk"></i> Enregistrer
+                        </button>
+                        <button type="button" id="relay-clear" class="btn btn-secondary btn-small">
+                            <i class="fas fa-xmark"></i> Retirer
+                        </button>
+                        <button type="button" id="relay-test" class="btn btn-secondary btn-small">
+                            <i class="fas fa-stethoscope"></i> Tester les sources
+                        </button>
+                    </div>
+                    <pre id="relay-health" hidden></pre>
+                </details>
+
+                <details class="blocklist">
+                    <summary>Sites bannis (<span id="blocklist-count">0</span>)</summary>
+                    <p class="field-hint">
+                        Un domaine par ligne. Ces sites sont écartés des résultats et exclus
+                        des requêtes envoyées aux moteurs de recherche.
+                    </p>
+                    <label class="sr-only" for="blocklist-field">Sites bannis</label>
+                    <textarea id="blocklist-field" rows="8" spellcheck="false"></textarea>
+                    <div class="blocklist-actions">
+                        <button type="button" id="blocklist-save" class="btn btn-primary btn-small">
+                            <i class="fas fa-floppy-disk"></i> Enregistrer
+                        </button>
+                        <button type="button" id="blocklist-reset" class="btn btn-secondary btn-small">
+                            <i class="fas fa-rotate-left"></i> Liste par défaut
+                        </button>
+                    </div>
+                </details>
+            </div>
+
+            <button type="button" id="search-button" class="btn btn-primary btn-large" disabled>
+                <i class="fas fa-search"></i> Lancer la recherche
+            </button>
+        </section>
+
+        <!-- Section Résultats -->
+        <section class="section">
+            <h2><i class="fas fa-list"></i> Résultats concrets (<span id="result-count">0</span>)</h2>
+            <div class="search-options">
+                <button type="button" id="refresh-button" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i> Actualiser
+                </button>
+                <button type="button" id="clear-results" class="btn btn-secondary">
+                    <i class="fas fa-trash"></i> Effacer
+                </button>
+            </div>
+            <div id="results" class="results-grid">
+                <p class="no-results">Choisis une localisation puis lance une recherche.</p>
+            </div>
+
+            <details id="diagnostics" class="blocklist" hidden>
+                <summary>Diagnostic de la dernière recherche</summary>
+                <p class="field-hint">
+                    Ce que chaque source a répondu. En cas de problème, copie ce texte :
+                    il dit exactement ce qui a échoué.
+                </p>
+                <pre id="diagnostics-body"></pre>
+                <div class="blocklist-actions">
+                    <button type="button" id="diagnostics-copy" class="btn btn-secondary btn-small">
+                        <i class="fas fa-copy"></i> Copier le diagnostic
+                    </button>
+                </div>
+            </details>
+        </section>
+
+        <!-- Section Favoris -->
+        <section class="section">
+            <h2><i class="fas fa-heart"></i> Favoris (<span id="favorites-count">0</span>)</h2>
+            <div id="favorites" class="results-grid"></div>
+        </section>
+
+        <!-- Section Historique -->
+        <section class="section">
+            <h2><i class="fas fa-history"></i> Historique des recherches</h2>
+            <div id="history" class="history-list"></div>
+        </section>
+    </div>
+
+    <footer>
+        <p>
+            <i class="fas fa-lock"></i> Tout reste sur cet appareil — aucun compte, aucun serveur.
+            <a href="#" id="clear-all-data">Effacer mes données</a>
+            <span id="app-version" class="app-version"></span>
+        </p>
+    </footer>
+
+    <!-- Modale de détail -->
+    <div id="profile-modal" class="modal" role="dialog" aria-modal="true" aria-label="Détail de l'annonce">
+        <div class="modal-content">
+            <button type="button" class="close-modal" aria-label="Fermer">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts : l'ordre compte (utils d'abord, app en dernier) -->
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/notifications.js"></script>
+    <script src="scripts/relay.js"></script>
+    <script src="scripts/backend.js"></script>
+    <script src="scripts/blocklist.js"></script>
+    <script src="scripts/filters.js"></script>
+    <script src="scripts/search-engine.js"></script>
+    <script src="scripts/geolocation.js"></script>
+    <script src="scripts/vision.js"></script>
+    <script src="scripts/favorites.js"></script>
+    <script src="scripts/render.js"></script>
+    <script src="scripts/sources.js"></script>
+    <script src="scripts/history.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
